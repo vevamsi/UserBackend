@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.PasswordDto;
+import com.example.demo.dto.ResetDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.dto.UserRegistrationDto;
 import com.example.demo.model.Address;
@@ -99,19 +101,27 @@ public class UserController {
      User user = userService.getUserById(userId);
 
      if (user == null) {
-         return null;
+         return null; // Return appropriate response or handle the case
      }
 
-     // Update user profile data based on userDto
      user.setFirst_name(userDto.getFirst_name());
      user.setLast_name(userDto.getLast_name());
+     user.setEmail(userDto.getEmail());
 
-    return userService.updateUser(user);
+     if (userDto.getAddress() != null) {
+         if (user.getAddress() == null) {
+             user.setAddress(new Address()); // Initialize if address doesn't exist
+         }
+         Address address = user.getAddress();
+         AddressDto addressDto = userDto.getAddress();
+         address.setCity(addressDto.getCity());
+         address.setState(addressDto.getState());
+         address.setCountry(addressDto.getCountry());
+         address.setPincode(addressDto.getPincode());
+     }
 
-    
+     return userService.updateUser(user);
  }
- 
-
 
     @PutMapping("/update")
     public ResponseEntity<User> updateUser(@RequestBody User updatedUser) {
@@ -126,6 +136,35 @@ public class UserController {
     public int login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto.getEmail(), loginDto.getPassword());
     }
+    @PutMapping("/password/{user_id}")
+    public ResponseEntity<String> resetPassword(@PathVariable int user_id, @RequestBody ResetDto resetDto) {
+        User user = userService.getUserById(user_id);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        UserAuthDetails userAuthDetails = userPassService.findByuserId(user_id);
+
+        if (userAuthDetails == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User credentials not found");
+        }
+
+        userAuthDetails.setPassword(resetDto.getPassword());
+        userPassService.saveUserPass(userAuthDetails);
+
+        return ResponseEntity.ok("Password reset successful");
+    }
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<String> deleteAllUsers() {
+        try {
+            userService.deleteAllUsers();
+            return ResponseEntity.ok("All users deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting users");
+        }
+    }
 
 }
+
 

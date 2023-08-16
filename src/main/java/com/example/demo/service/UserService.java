@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.model.Address;
 import com.example.demo.model.User;
 import com.example.demo.model.UserAuthDetails;
 import com.example.demo.repository.UserCredentialRepository;
@@ -23,9 +25,6 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired 
-    private UserCredentialRepository userCredRepository;
-
     public User saveUser(User user) {
         return userRepository.save(user);
     }
@@ -53,16 +52,6 @@ public class UserService {
 
 	 public int login(String email, String password) {
 	        User user = userRepository.findByEmail(email);
-	        
-//	        if (user == null) {
-//	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-//	        }
-	        
-//	        Optional<UserAuthDetails> userPass = userCredRepository.findById(user.getUser_id());
-
-//	        if (userPass == null || !userPass.get().getPassword().equals(password)) {
-//	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-//	        }
 
 	        return user.getUser_id();
 	 }
@@ -70,11 +59,20 @@ public class UserService {
 	public UserDto getUserProfile(int userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user != null) {
-            return new UserDto(user.getUser_id(), user.getFirst_name(),user.getLast_name(),user.getEmail());
+            Address address = user.getAddress(); // Assuming you have a getter for address in User entity
+            AddressDto addressDto = new AddressDto(address.getCity(), address.getState(), address.getCountry(), address.getPincode());
+            
+            return new UserDto(user.getUser_id(), user.getFirst_name(), user.getLast_name(), user.getEmail(), addressDto);
         }
         return null;
 
 	}
+
+	public void deleteAllUsers() {
+		userRepository.deleteAll();
+		
+	}
+	
 
 	}
 

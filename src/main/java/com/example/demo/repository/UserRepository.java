@@ -10,6 +10,7 @@ import com.example.demo.model.User;
 public interface UserRepository extends JpaRepository<User, Integer> {
 	//@Query("SELECT u FROM users u WHERE u.email = :email")
 	//User findByEmail(@Param("email")String email);
-	@Query(value="SELECT * FROM users WHERE email = :email",nativeQuery=true)
+	@Query(value="SELECT * FROM users WHERE email = :email LIMIT 1",nativeQuery=true)
 	User findByEmail(@Param("email")String email);
+	
 }

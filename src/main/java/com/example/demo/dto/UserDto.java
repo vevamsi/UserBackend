@@ -5,11 +5,12 @@ public class UserDto {
     private String first_name;
     private String last_name;
     private String email;
-	public int getUserId() {
+    private AddressDto address;
+	public int getUser_id() {
 		return user_id;
 	}
-	public void setUserId(int userId) {
-		this.user_id = userId;
+	public void setUser_id(int user_id) {
+		this.user_id = user_id;
 	}
 	public String getFirst_name() {
 		return first_name;
@@ -29,17 +30,23 @@ public class UserDto {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public UserDto(int userId, String first_name, String last_name, String email) {
+	public AddressDto getAddress() {
+		return address;
+	}
+	public void setAddress(AddressDto address) {
+		this.address = address;
+	}
+	public UserDto(int user_id, String first_name, String last_name, String email, AddressDto address) {
 		super();
-		this.user_id = userId;
+		this.user_id = user_id;
 		this.first_name = first_name;
 		this.last_name = last_name;
 		this.email = email;
+		this.address = address;
 	}
 	public UserDto() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-    
 }
+	
