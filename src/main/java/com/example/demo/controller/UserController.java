@@ -1,7 +1,11 @@
 package com.example.demo.controller;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.LoginDto;
-import com.example.demo.dto.PasswordDto;
 import com.example.demo.dto.ResetDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.dto.UserRegistrationDto;
+import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.model.User;
 import com.example.demo.model.UserAuthDetails;
@@ -20,6 +24,7 @@ import com.example.demo.service.AddressService;
 import com.example.demo.service.UserCredentialService;
 import com.example.demo.service.UserService;
 @CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -30,7 +35,8 @@ public class UserController {
     private UserCredentialService userPassService;
     @Autowired
     private AddressService addressService;
-    
+    private final Logger logger = LoggerFactory.getLogger(UserController.class);
+
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) {
@@ -68,11 +74,17 @@ public class UserController {
     }
     @GetMapping("/profile/{userId}")
     public ResponseEntity<UserDto> getUserProfile(@PathVariable int userId) {
-        UserDto userProfile = userService.getUserProfile(userId);
-        if (userProfile != null) {
-            return ResponseEntity.ok(userProfile);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            UserDto userProfile = userService.getUserProfile(userId);
+            if (userProfile != null) {
+                return ResponseEntity.ok(userProfile);
+            } else {
+                logger.warn("User profile not found for user ID: {}", userId);
+                throw new UserNotFoundException("User profile not found");
+            }
+        } catch (Exception e) {
+            logger.error("An error occurred while fetching user profile", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
@@ -87,13 +99,19 @@ public class UserController {
         }
         
     }
- @GetMapping("/{email}")
+    @GetMapping("/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        User user = userService.getUserByEmail(email);
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            User user = userService.getUserByEmail(email);
+            if (user != null) {
+                return ResponseEntity.ok(user);
+            } else {
+                logger.warn("User not found for email: {}", email);
+                throw new UserNotFoundException("User not found");
+            }
+        } catch (Exception e) {
+            logger.error("An error occurred while fetching user by email", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
  @PostMapping("/profile/{userId}")
@@ -136,8 +154,8 @@ public class UserController {
     public int login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto.getEmail(), loginDto.getPassword());
     }
-    @PutMapping("/password/{user_id}")
-    public ResponseEntity<String> resetPassword(@PathVariable int user_id, @RequestBody ResetDto resetDto) {
+    @PutMapping("/reset/{user_id}")
+    public ResponseEntity<?> resetPassword(@PathVariable int user_id, @RequestBody ResetDto resetDto) {
         User user = userService.getUserById(user_id);
 
         if (user == null) {
@@ -164,6 +182,29 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting users");
         }
     }
+    @PostMapping("/forgot")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");
+        
+        if (email == null) {
+            return ResponseEntity.badRequest().body("Email parameter is missing in the request body.");
+        }
+        
+        User user = userService.getUserByEmail(email);
+        
+        if (user != null) {
+            return ResponseEntity.ok().body(Collections.singletonMap("user_id", user.getUser_id()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/delete/{user_id}")
+    public ResponseEntity<?> deleteUser(@PathVariable int user_id) {
+        userService.deleteUser(user_id);
+        return ResponseEntity.ok("User deleted successfully");
+    }
+
 
 }
 

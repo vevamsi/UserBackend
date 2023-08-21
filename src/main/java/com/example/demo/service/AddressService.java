@@ -1,5 +1,6 @@
 package com.example.demo.service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ public class AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
+    private final Logger logger = LoggerFactory.getLogger(AddressService.class);
 
     public Address saveAddress(Address address) {
         return addressRepository.save(address);
@@ -21,13 +23,12 @@ public class AddressService {
     public AddressDto getAddressDtosByUserId(int userId) {
         Address address = addressRepository.findByUserId(userId);
         if (address != null) {
-            AddressDto addressDto = new AddressDto();
-            addressDto.setCity(address.getCity());
-            addressDto.setState(address.getState());
-            addressDto.setCountry(address.getCountry());
-            addressDto.setPincode(address.getPincode());
-        return addressDto;
+            AddressDto addressDto = new AddressDto(address.getCity(), address.getState(), address.getCountry(), address.getPincode());
+            return addressDto;
+        } else {
+            logger.warn("Address not found for user ID: {}", userId);
+            return null;
+        }
     }
-        return null;
-}
+
 }

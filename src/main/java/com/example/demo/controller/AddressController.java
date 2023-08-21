@@ -14,6 +14,7 @@ import com.example.demo.dto.AddressDto;
 import com.example.demo.model.Address;
 import com.example.demo.service.AddressService;
 @CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
 @RestController
 @RequestMapping("/addresses")
 public class AddressController {
