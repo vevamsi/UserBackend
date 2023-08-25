@@ -4,11 +4,19 @@ public class UserRegistrationDto {
 	    private String first_name;
 	    private String last_name;
 	    private String email;
+	    private String role;
 	    private String password;
 	    private String city;
 	    private String state;
 	    private String country;
 	    private String pincode;
+	    private String departmentCode;
+		public String getDepartmentCode() {
+			return departmentCode;
+		}
+		public void setDepartmentCode(String departmentCode) {
+			this.departmentCode = departmentCode;
+		}
 		public String getFirst_name() {
 			return first_name;
 		}
@@ -26,6 +34,12 @@ public class UserRegistrationDto {
 		}
 		public void setEmail(String email) {
 			this.email = email;
+		}
+		public String getRole() {
+			return role;
+		}
+		public void setRole(String role) {
+			this.role = role;
 		}
 		public String getPassword() {
 			return password;
@@ -57,7 +71,5 @@ public class UserRegistrationDto {
 		public void setPincode(String pincode) {
 			this.pincode = pincode;
 		}
-
-} // Getters and setters for all fields
-
-	   
+	    
+}	   

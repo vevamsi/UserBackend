@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.demo.dto.APIResponseDto;
 import com.example.demo.dto.AddressDto;
+import com.example.demo.dto.DepartmentDto;
 import com.example.demo.dto.LoginDto;
 import com.example.demo.dto.ResetDto;
 import com.example.demo.dto.UserDto;
@@ -20,15 +22,17 @@ import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.model.User;
 import com.example.demo.model.UserAuthDetails;
+import com.example.demo.service.APIClient;
 import com.example.demo.service.AddressService;
 import com.example.demo.service.UserCredentialService;
 import com.example.demo.service.UserService;
-@CrossOrigin(origins = "http://localhost:4200")
-//@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
+//@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
+	@Autowired
+	APIClient apiClient;
     @Autowired
     private UserService userService;
     @Autowired
@@ -45,10 +49,10 @@ public class UserController {
             u.setFirst_name(userRegistrationDto.getFirst_name());
             u.setLast_name(userRegistrationDto.getLast_name());
             u.setEmail(userRegistrationDto.getEmail());
-
-      
+            u.setRole(userRegistrationDto.getRole());
+            u.setDepartmentCode(userRegistrationDto.getDepartmentCode());
             User savedUser = userService.saveUser(u);
-
+            
      
             UserAuthDetails userPass = new UserAuthDetails();
             userPass.setPassword(userRegistrationDto.getPassword());
@@ -116,7 +120,7 @@ public class UserController {
     }
  @PostMapping("/profile/{userId}")
  public User updateProfile(@PathVariable int userId, @RequestBody UserDto userDto) {
-     User user = userService.getUserById(userId);
+     User user = userService.findById(userId);
 
      if (user == null) {
          return null; // Return appropriate response or handle the case
@@ -140,7 +144,33 @@ public class UserController {
 
      return userService.updateUser(user);
  }
+ @PostMapping("/update/{userId}")
+ public User updateUser(@PathVariable int userId, @RequestBody APIResponseDto apiDto) {
+     User user = userService.findById(userId);
 
+     if (user == null) {
+         return null; // Return appropriate response or handle the case
+     }
+     
+     user.setFirst_name(apiDto.user.getFirst_name());
+     user.setLast_name(apiDto.user.getLast_name());
+     user.setEmail(apiDto.user.getEmail());
+
+     if (apiDto.user.getAddress() != null) {
+         if (user.getAddress() == null) {
+             user.setAddress(new Address()); // Initialize if address doesn't exist
+         }
+         Address address = user.getAddress();
+         AddressDto addressDto =apiDto.user.getAddress();
+         address.setCity(addressDto.getCity());
+         address.setState(addressDto.getState());
+         address.setCountry(addressDto.getCountry());
+         address.setPincode(addressDto.getPincode());
+     }
+     user.setDepartmentCode(apiDto.department.getDepartmentCode());
+
+     return userService.updateUser(user);
+ }
     @PutMapping("/update")
     public ResponseEntity<User> updateUser(@RequestBody User updatedUser) {
         User updated = userService.updateUser(updatedUser);
@@ -151,12 +181,12 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public int login(@RequestBody LoginDto loginDto) {
+    public User login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto.getEmail(), loginDto.getPassword());
     }
     @PutMapping("/reset/{user_id}")
     public ResponseEntity<?> resetPassword(@PathVariable int user_id, @RequestBody ResetDto resetDto) {
-        User user = userService.getUserById(user_id);
+        User user = userService.findById(user_id);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -204,8 +234,24 @@ public class UserController {
         userService.deleteUser(user_id);
         return ResponseEntity.ok("User deleted successfully");
     }
+    @PostMapping("/saveDepartment")
+    public DepartmentDto saveDepartment(@RequestBody DepartmentDto departmentDto) {
+        return apiClient.saveDepartment(departmentDto);
+    }
+    @GetMapping("/getDepartment/{departmentCode}")
+    public DepartmentDto getDepartment(@PathVariable String departmentCode) {
+        return apiClient.getDepartment(departmentCode);
+    }
 
-
+    @GetMapping("/getAllDepartments")
+    public List<DepartmentDto> getAllDepartments() {
+        return apiClient.getAllDepartment();
+    }
+    @GetMapping("/departmentUsers/{departmentCode}")
+    public List<User> getDepartmentUsers(@PathVariable String departmentCode) {
+        List<User> departmentUsers = userService.getUsersByDepartmentCode(departmentCode);
+        return departmentUsers;
+    }
 }
 
 

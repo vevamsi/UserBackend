@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.dto.PasswordDto;
 import com.example.demo.model.UserAuthDetails;
 import com.example.demo.service.UserCredentialService;
-@CrossOrigin(origins = "http://localhost:4200")
-//@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
+//@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
 @RestController
-@RequestMapping("/password")
+@RequestMapping("users/password")
 public class UserCredentialController {
 
     @Autowired

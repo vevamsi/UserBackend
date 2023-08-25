@@ -6,6 +6,8 @@ public class UserDto {
     private String last_name;
     private String email;
     private AddressDto address;
+    private String departmentCode;
+    private String role;
 	public int getUser_id() {
 		return user_id;
 	}
@@ -36,17 +38,32 @@ public class UserDto {
 	public void setAddress(AddressDto address) {
 		this.address = address;
 	}
-	public UserDto(int user_id, String first_name, String last_name, String email, AddressDto address) {
+	public String getDepartmentCode() {
+		return departmentCode;
+	}
+	public void setDepartmentCode(String departmentCode) {
+		this.departmentCode = departmentCode;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
+	public UserDto() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public UserDto(int user_id, String first_name, String last_name, String email, AddressDto address,
+			String departmentCode, String role) {
 		super();
 		this.user_id = user_id;
 		this.first_name = first_name;
 		this.last_name = last_name;
 		this.email = email;
 		this.address = address;
-	}
-	public UserDto() {
-		super();
-		// TODO Auto-generated constructor stub
+		this.departmentCode = departmentCode;
+		this.role = role;
 	}
 }
-	
+    

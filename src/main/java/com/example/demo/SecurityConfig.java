@@ -28,9 +28,10 @@ public class SecurityConfig {
         	.and()
             .authorizeRequests(authorizeRequests ->
                 authorizeRequests
-                    .antMatchers("/users/login").authenticated()
+                    //.antMatchers("/users/login").authenticated()
+                    .antMatchers("/users/getAll").hasRole("ADMIN")
                     .antMatchers("/users/getAll").authenticated()
-                    .antMatchers("/users/delete/{user_id}").authenticated()
+                   // .antMatchers("/users/delete/{user_id}").authenticated()
                     .anyRequest().permitAll()
             )
             .httpBasic();
@@ -56,18 +57,38 @@ PasswordEncoder encoder = new BCryptPasswordEncoder();
             .password(encodedPassword) // Use the encoded password here
             .roles("USER")
             .build();
-        return new InMemoryUserDetailsManager(userDetails);
-    }
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Allow requests from this origin
-        corsConfig.addAllowedMethod("*");
-        corsConfig.addAllowedHeader("*");
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(encoder.encode("password"))
+                .roles("ADMIN")
+                .build();
+        
+      return new InMemoryUserDetailsManager(userDetails, admin);
+        }
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig);
+        @Bean
+        public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+            http
+                .antMatcher("/admin/**")
+                .authorizeRequests(authorizeRequests ->
+                    authorizeRequests
+                        .anyRequest().hasRole("ADMIN")
+                )
+                .httpBasic();
 
-        return source;
-    }
+            return http.build();
+        }
+       
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration corsConfig = new CorsConfiguration();
+//        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Allow requests from this origin
+//        corsConfig.addAllowedMethod("*");
+//        corsConfig.addAllowedHeader("*");
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", corsConfig);
+//
+//        return source;
+//    }
 }

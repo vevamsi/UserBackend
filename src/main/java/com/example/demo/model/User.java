@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,6 +25,25 @@ public class User {
 	private UserAuthDetails userAuthDetails;
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	private Address address;
+	private String departmentCode;
+	@Column(name = "role")
+    private String role;
+	public User() {
+		super();
+	}
+	public User(int user_id, String first_name, String last_name,
+			@Email(message = "Not a valid Email Format") String email, UserAuthDetails userAuthDetails, Address address,
+			String departmentCode, String role) {
+		super();
+		this.user_id = user_id;
+		this.first_name = first_name;
+		this.last_name = last_name;
+		this.email = email;
+		this.userAuthDetails = userAuthDetails;
+		this.address = address;
+		this.departmentCode = departmentCode;
+		this.role = role;
+	}
 	public int getUser_id() {
 		return user_id;
 	}
@@ -60,26 +80,22 @@ public class User {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
-	public User(int user_id, @NotNull String first_name, @NotNull String last_name,
-			@Email(message = "Not a valid Email Format") String email, UserAuthDetails userAuthDetails,
-			Address address) {
-		super();
-		this.user_id = user_id;
-		this.first_name = first_name;
-		this.last_name = last_name;
-		this.email = email;
-		this.userAuthDetails = userAuthDetails;
-		this.address = address;
+	public String getDepartmentCode() {
+		return departmentCode;
 	}
-	public User() {
-		super();
-		// TODO Auto-generated constructor stub
+	public void setDepartmentCode(String departmentCode) {
+		this.departmentCode = departmentCode;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
 	}
 	@Override
 	public String toString() {
 		return "User [user_id=" + user_id + ", first_name=" + first_name + ", last_name=" + last_name + ", email="
-				+ email + ", userAuthDetails=" + userAuthDetails + ", address=" + address + "]";
+				+ email + ", userAuthDetails=" + userAuthDetails + ", address=" + address + ", departmentCode="+ departmentCode +", role=" + role + "]";
 	}
-	
 	
 }
