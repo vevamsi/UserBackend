@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.cg.departmentservice.entity.Department;
 import com.cg.departmentservice.service.DepartmentService;
-@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
+//@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
 @RestController
 @RequestMapping("api/departments")
 public class DepartmentController {
