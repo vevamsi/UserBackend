@@ -27,7 +27,7 @@ import com.example.demo.service.AddressService;
 import com.example.demo.service.UserCredentialService;
 import com.example.demo.service.UserService;
 //@CrossOrigin(origins = "http://localhost:4200")
-@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
+//@CrossOrigin(origins = "http://frontend-bucket-vamsi.s3-website-us-east-1.amazonaws.com")
 @RestController
 @RequestMapping("/users")
 public class UserController {
