@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.dto.APIResponseDto;
 import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.DepartmentDto;
 import com.example.demo.dto.LoginDto;
@@ -122,7 +121,7 @@ public class UserController {
      User user = userService.findById(userId);
 
      if (user == null) {
-         return null; // Return appropriate response or handle the case
+         return null; 
      }
 
      user.setFirst_name(userDto.getFirst_name());
@@ -131,7 +130,7 @@ public class UserController {
 
      if (userDto.getAddress() != null) {
          if (user.getAddress() == null) {
-             user.setAddress(new Address()); // Initialize if address doesn't exist
+             user.setAddress(new Address());
          }
          Address address = user.getAddress();
          AddressDto addressDto = userDto.getAddress();
@@ -148,7 +147,7 @@ public class UserController {
      User user = userService.findById(userId);
 
      if (user == null) {
-         return null; // Return appropriate response or handle the case
+         return null; 
      }
      
      user.setFirst_name(apiDto.getFirst_name());
